@@ -13,6 +13,7 @@ from .rewards import RewardStore
 from .accounts import AccountStore
 from .backup import create_backup
 from .dedup import find_similar
+from .ui_theme import STYLE, render_navigation
 
 @st.cache_resource
 def get_service(db_path="data/phase1.db"): return Phase1Service(db_path=db_path)
@@ -49,15 +50,7 @@ def initialize_public_demo():
     return service, rewards, workspace_id
 
 def render_app():
-    st.markdown("""<style>
-    :root{--cream:#f8f5ee;--paper:#fffdf8;--sage:#819779;--sage-dark:#5f735f;--clay:#c98770;--mist:#dce5ed;--ink:#373a34;--line:#d9ded5}
-    [data-testid="stAppViewContainer"]{background:radial-gradient(circle at 85% 5%,#dce5edaa 0,transparent 28%),radial-gradient(circle at 5% 75%,#e6eddc 0,transparent 30%),repeating-linear-gradient(0deg,rgba(55,58,52,.018) 0,rgba(55,58,52,.018) 1px,transparent 1px,transparent 5px),var(--cream);color:var(--ink)}
-    [data-testid="stHeader"]{background:transparent}.block-container{max-width:1500px;padding-top:2rem}
-    [data-testid="stSidebar"]{background:linear-gradient(180deg,#eef2ea,#e7eee5);border-right:1px solid #d0d9cc}
-    .hero{padding:2.3rem 2.5rem;border-radius:18px;background:linear-gradient(105deg,#fffdf8ee,#f1f5eddd);border:1px solid #d6ddd0;color:var(--ink);margin-bottom:1.35rem;box-shadow:0 14px 35px #77836a22;position:relative;overflow:hidden}.hero:before{content:'✦';position:absolute;right:12%;top:17%;font-size:4rem;color:#c9877040;transform:rotate(16deg)}.hero:after{content:'⌁  ·  ✧  ·  ⌁';position:absolute;right:5%;bottom:18%;font-size:1.5rem;color:#81977966;letter-spacing:.7rem}.hero h1{margin:0;font-family:Georgia,'Noto Serif SC',serif;font-size:2.6rem;letter-spacing:-.04em;color:#40513f}.hero p{margin:.65rem 0 0;color:#667164;font-size:1.03rem}.tag{display:inline-block;margin-top:1.15rem;padding:.35rem .8rem;border-radius:20px;background:#81977918;border:1px solid #81977955;color:#5f735f;font-size:.72rem;letter-spacing:.08em}.journal-subtitle{font-family:Georgia,'Noto Serif SC',serif;color:#6f7f6a;font-size:1.05rem;margin:.2rem 0 1rem}.desk-card{background:#fffdf8d9;border:1px solid #d9ded5;border-radius:14px;padding:1rem 1.15rem;box-shadow:0 8px 22px #77836a16;height:100%}.desk-card h4{font-family:Georgia,'Noto Serif SC',serif;color:#52664f;margin:.1rem 0 .4rem}.desk-card p{color:#697265;font-size:.9rem;margin:0}.ring{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient(var(--sage) var(--progress),#e4eadf 0);position:relative}.ring:after{content:'';position:absolute;width:55px;height:55px;background:var(--paper);border-radius:50%}.ring span{position:relative;z-index:1;font-weight:700;color:var(--sage-dark)}.section{border-left:4px solid var(--sage);padding-left:.7rem}.stTabs [data-baseweb="tab-list"]{gap:.35rem;background:#eef2e9cc;padding:.4rem;border-radius:14px;border:1px solid #d4ddd1}.stTabs [data-baseweb="tab"]{color:#687465;border-radius:10px}.stTabs [aria-selected="true"]{background:#81977922;color:#506650}.stButton>button,.stDownloadButton>button{border-radius:10px;border:1px solid #81977988;background:linear-gradient(100deg,#819779,#6d866b);color:#fff;box-shadow:0 7px 18px #81977933}.stButton>button:hover{border-color:#c98770;color:#fff}.stTextInput input,.stTextArea textarea{background:#fffdf8;color:var(--ink);border:1px solid #cfd8ca;border-radius:10px}.stExpander{background:#fffdf8cc;border:1px solid #d9ded5;border-radius:13px}.stDataFrame{border:1px solid #d9ded5;border-radius:12px;overflow:hidden}.stMetric{background:#fffdf8aa;border:1px solid #d9ded5;border-radius:12px;padding:.6rem .8rem;box-shadow:0 5px 15px #77836a12}.stMetric label{color:#71806e}.stMetric [data-testid="stMetricValue"]{color:#52664f}
-    @keyframes journalFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@keyframes journalFloat{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(10px,-14px,0) scale(1.04)}}@keyframes journalPulse{0%,100%{box-shadow:0 0 0 0 #81977922}50%{box-shadow:0 0 0 10px #81977900}}.block-container{animation:journalFade .65s ease both}.ambient{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}.ambient span{position:absolute;display:block;border-radius:50%;filter:blur(1px);opacity:.32;animation:journalFloat 9s ease-in-out infinite}.ambient .orb-a{width:170px;height:170px;right:7%;top:18%;background:#dce5ed99}.ambient .orb-b{width:120px;height:120px;left:24%;bottom:8%;background:#c9877040;animation-delay:-3s;animation-duration:12s}.ambient .orb-c{width:78px;height:78px;right:35%;bottom:30%;background:#81977944;animation-delay:-5s;animation-duration:10s}.hero,.desk-card,.stMetric{position:relative;z-index:1}.hero{animation:journalFade .7s ease both}.desk-card{transition:transform .25s ease,box-shadow .25s ease}.desk-card:hover{transform:translateY(-4px);box-shadow:0 14px 28px #77836a2b}.ring{animation:journalPulse 2.8s ease-in-out infinite}.stButton>button,.stDownloadButton>button{transition:transform .2s ease,box-shadow .2s ease}.stButton>button:hover,.stDownloadButton>button:hover{transform:translateY(-2px);box-shadow:0 10px 22px #81977955}@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}.account-bar{display:flex;justify-content:space-between;align-items:center;background:#fffdf8c9;border:1px solid #d9ded5;border-radius:12px;padding:.7rem 1rem;margin:.2rem 0 1rem;box-shadow:0 5px 15px #77836a12}.account-bar span{font-family:Georgia,serif;color:#52664f;font-weight:700}.account-bar small{color:#819779}.stForm{background:#fffdf8aa;border:1px solid #d9ded5;border-radius:12px;padding:.7rem}.achievement-card{background:#ffffffaa;border:1px solid #d9ded5;border-radius:14px;padding:.75rem;min-height:92px;box-shadow:0 5px 15px #77836a12;transition:transform .2s ease}.achievement-card:hover{transform:translateY(-3px)}.achievement-card b,.achievement-card small{display:block;color:#52664f}.achievement-card small{margin-top:.25rem;color:#819779}.achievement-icon{font-size:1.5rem;display:block;margin-bottom:.25rem}.ios-panel{background:rgba(255,255,255,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.85);box-shadow:0 12px 30px rgba(60,60,67,.12)}[data-testid="stAppViewContainer"]{background:linear-gradient(145deg,#f5f5f7 0%,#eef3f5 48%,#f8f8fa 100%)}[data-testid="stSidebar"]{background:rgba(248,248,250,.78);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}.hero,.desk-card,.stMetric,.stForm,.achievement-card{background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-color:rgba(255,255,255,.9);box-shadow:0 10px 28px rgba(60,60,67,.1)}.stButton>button,.stDownloadButton>button{background:linear-gradient(180deg,#0a84ff,#007aff);border:0;border-radius:12px;box-shadow:0 7px 16px rgba(0,122,255,.22)}.stTextInput input,.stTextArea textarea{background:rgba(255,255,255,.82);border:1px solid #d1d1d6;border-radius:12px}.refined{font-family:Georgia,'Noto Serif SC',serif}.hero h1{font-family:Georgia,'Noto Serif SC',serif;font-weight:500;letter-spacing:-.055em}.hero p{letter-spacing:.02em}.section h3{font-weight:500;letter-spacing:.02em}.desk-card{border-radius:18px}.achievement-card{border-radius:16px}</style>""", unsafe_allow_html=True)
-    st.markdown('''<style>.quick-card{background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.92);border-radius:20px;padding:1.1rem 1.2rem;min-height:142px;box-shadow:0 12px 28px rgba(60,60,67,.1);transition:all .25s ease}.quick-card:hover{transform:translateY(-5px);box-shadow:0 18px 36px rgba(60,60,67,.16)}.quick-card .icon{font-size:1.65rem}.quick-card h4{margin:.55rem 0 .25rem;color:#27384c}.quick-card p{margin:0;color:#667085;font-size:.88rem;line-height:1.55}.stepper{display:flex;gap:.55rem;align-items:center;margin:.8rem 0 1.1rem}.stepper .step{flex:1;padding:.65rem .7rem;border-radius:12px;background:#eef2f6;color:#667085;font-size:.82rem;text-align:center}.stepper .step.active{background:#e5f0ff;color:#0878e8;font-weight:700}.stepper .line{height:2px;flex:.18;background:#d8e1ec}.empty-panel{padding:2rem 1rem;border:1px dashed #cfd8e3;border-radius:18px;background:rgba(255,255,255,.55);text-align:center;color:#718096}.answer-bubble{padding:1rem 1.1rem;border-radius:16px;background:#edf6ff;border:1px solid #cfe5fb;line-height:1.7;color:#23364d}.metric-card{background:rgba(255,255,255,.74);border:1px solid rgba(255,255,255,.94);border-radius:16px;padding:.85rem}.metric-card b{display:block;font-size:1.4rem;color:#27384c}.metric-card small{color:#738096}</style>''', unsafe_allow_html=True)
-    st.markdown('<div class="ambient" aria-hidden="true"><span class="orb-a"></span><span class="orb-b"></span><span class="orb-c"></span></div><div class="hero"><h1>✦ 课程知识档案馆</h1><p>将讲义、文档和演示稿整理为一套精致、可追溯的课程知识系统。</p><span class="tag">STUDY JOURNAL · COURSE KNOWLEDGE WORKSPACE</span></div>', unsafe_allow_html=True)
+    st.markdown(STYLE, unsafe_allow_html=True)
     demo_mode = public_demo_enabled()
     if demo_mode:
         service, rewards, workspace_id = initialize_public_demo()
@@ -73,6 +66,7 @@ def render_app():
     if "account_name" not in st.session_state: st.session_state["account_name"] = ""
     top_left, top_right = st.columns([5, 1])
     with top_left:
+        st.markdown('<div class="brand"><span class="brand-mark">✳</span><span>知屿<small>COURSE LEARNING WORKSPACE</small></span></div>', unsafe_allow_html=True)
         if demo_mode:
             st.caption("公开演示 · 每个访客使用独立临时课程空间；请勿上传隐私或敏感资料")
         else:
@@ -140,13 +134,9 @@ def render_app():
     if st.sidebar.button("重置本课程奖励"): rewards.reset(workspace_id); st.rerun()
     if not demo_mode:
         st.sidebar.caption(f"SQLite：{service.repo.path}")
-    if "page_jump" in st.session_state:
-        st.session_state["page_selected"] = st.session_state.pop("page_jump")
-    pages = ["今日书桌", "资料库", "知识目录", "复习中心", "资料问答", "知识点掌握度", "Agent整理质量", "长期记忆"]
-    if st.session_state.get("page_selected") == "我的掌握度": st.session_state["page_selected"] = "知识点掌握度"
-    page = st.sidebar.radio("功能区", pages, index=pages.index(st.session_state.get("page_selected", "今日书桌")), key="page_selected")
-    st.sidebar.caption("选择一个功能区开始学习")
+    page = render_navigation()
     if page == "今日书桌":
+        st.markdown('<div class="hero"><div class="eyebrow">SMALL STEPS, LASTING KNOWLEDGE</div><h1>把知识整理好，<br>让每一次学习都有收获。</h1><p>资料整理、知识复习与学习反馈，在一个空间里衔接。</p></div>', unsafe_allow_html=True)
         docs_count = len(service.repo.documents(workspace_id)); total = len(stats); progress = round(len(confirmed) / total * 100) if total else 0
         reviewable = service.review_queue(workspace_id)
         st.markdown('<div class="journal-subtitle">从一个小目标开始，今天也给课程留一点安静的时间。</div>', unsafe_allow_html=True)
@@ -192,7 +182,7 @@ def render_app():
             st.markdown('<div class="quick-card"><span class="icon">☕</span><h4>温柔复习室</h4><p>查看待办、知识卡片和已经整理的内容。</p></div>', unsafe_allow_html=True)
             if st.button("进入复习", key="home-review"): st.session_state["page_jump"] = "复习中心"; st.rerun()
         st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
-        st.info("提示：从左侧选择功能区，主页只保留学习概览，不会一次展开所有工具。")
+        st.info("提示：从顶部选择功能区，主页只保留学习概览，不会一次展开所有工具。")
     elif page == "资料库":
         st.markdown('<div class="section"><h3>📤 资料上传</h3></div>', unsafe_allow_html=True)
         st.info("只保留一个资料入口：上传自己的 TXT、Markdown、Word（DOCX）、PowerPoint（PPTX）或可复制文字的 PDF。单个文件上限 20 MB；扫描版 PDF 暂不支持 OCR。")
