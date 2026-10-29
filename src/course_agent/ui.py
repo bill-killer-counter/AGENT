@@ -13,7 +13,7 @@ from .rewards import RewardStore
 from .accounts import AccountStore
 from .backup import create_backup
 from .dedup import find_similar
-from .ui_theme import STYLE, render_navigation
+from .ui_theme import NAVIGATION, STYLE, render_navigation
 
 @st.cache_resource
 def get_service(db_path="data/phase1.db"): return Phase1Service(db_path=db_path)
@@ -391,8 +391,12 @@ def render_app():
         q3.metric("幻觉风险系数", f"{hallucination_risk}%", delta="越低越好", delta_color="inverse")
         q4.metric("重复知识率", f"{duplicate_rate * 100:.1f}%", delta="越低越好", delta_color="inverse")
         st.bar_chart(quality_chart, x="指标", y="得分", color="#0A84FF", horizontal=True)
+        # 导航页的唯一来源是 ui_theme.NAVIGATION。此前这里误引用了未定义的
+        # pages，导致打开“Agent 整理质量”时直接中断页面渲染。
+        available_pages = {item[0] for item in NAVIGATION}
+        core_pages = {"资料库", "知识目录", "资料问答", "知识点掌握度", "长期记忆"}
         rubric = [
-            ("功能完整性", 15, 15 if all(x in pages for x in ["资料库", "知识目录", "资料问答", "知识点掌握度", "长期记忆"]) else 8, "资料导入、目录、问答、问卷、记忆和导出入口均已实现"),
+            ("功能完整性", 15, 15 if core_pages.issubset(available_pages) else 8, "资料导入、目录、问答、问卷、记忆和导出入口均已实现"),
             ("UI 视觉与设计", 10, 9, "统一玻璃卡片、层级、动效、颜色和响应式布局；仍需真实学生访谈"),
             ("用户体验与易用性", 10, 9 if docs or not st.session_state.get("logged_in") else 8, "单窗口一键整理、空状态提示、复习卡片和步骤反馈"),
             ("数据与结果准确性", 15, round(15 * source_rate, 1), f"知识点来源完整率 {source_rate * 100:.1f}%；正式准确率需 B 标注集复核"),
